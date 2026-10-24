@@ -150,3 +150,48 @@ ON s.student_id = e.student_id
 AND sub.subject_name = e.subject_name
 GROUP BY s.student_id, s.student_name, sub.subject_name
 ORDER BY s.student_id, sub.subject_name;
+
+/*
+570. Managers with at Least 5 Direct Reports
+    Write a solution to find managers with at least five direct reports.
+    Return the result table in any order.
+*/
+
+SELECT name
+FROM Employee
+WHERE id in (
+    SELECT managerId
+    FROM Employee
+    GROUP BY managerId
+    HAVING COUNT(managerId) >= 5
+);
+
+
+/*
+1934. Confirmation Rate
+    The confirmation rate of a user is the number of 'confirmed' messages
+    divided by the total number of requested confirmation messages.
+    The confirmation rate of a user that did not request any confirmation messages is 0.
+    Round the confirmation rate to two decimal places.
+    Write a solution to find the confirmation rate of each user.
+    Return the result table in any order.
+*/
+
+-- Specify the decimal by explicitly writing 1.00 for confirmed messages.
+-- ROUND(x, 2) rounds to two decimal places but doesn't necessarily display trailing zeros.
+-- Use AVG() to simplify the calculation instead of dividing by COUNT() explicitly.
+
+SELECT
+    s.user_id,
+    ROUND(
+        AVG(
+            CASE
+                WHEN c.action = 'confirmed' THEN 1.00
+                ELSE 0
+            END
+        )
+    , 2) as confirmation_rate
+FROM Signups s
+LEFT JOIN Confirmations c
+ON s.user_id = c.user_id
+GROUP BY s.user_id;
